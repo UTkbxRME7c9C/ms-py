@@ -35,3 +35,4 @@ def print_board_answers(sweep):
                 print("|" + str(sweep.mines[i][j]), end="")
         print("|")
     print(" "+ ("*-" * sweep.width) + "*")
+    
