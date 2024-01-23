@@ -33,13 +33,6 @@ jobs:
         pip install pygame pyinstaller
     - name: Build app
       run: make build
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v2
       with:
-        name: build-win
         path: dist/*
-        if: matrix.os == 'windows-latest'
-    - uses: actions/upload-artifact@v4
-      with:
-        name: build-linux
-        path: dist/*
-        if: matrix.os == 'ubuntu-latest'
