@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os: ['windows-latest', 'ubuntu-latest']
 
     steps:
     - uses: actions/checkout@v3
@@ -37,3 +37,4 @@ jobs:
       with:
         name: builds
         path: dist/*
+      if: runner.os == 'Windows'
