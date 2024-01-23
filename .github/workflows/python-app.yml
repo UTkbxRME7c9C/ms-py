@@ -33,7 +33,7 @@ jobs:
         pip install pygame pyinstaller
     - name: Build app
       run: make build
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: builds
         path: dist/*
