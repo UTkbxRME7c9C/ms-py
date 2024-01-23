@@ -4,11 +4,15 @@ A Python implementation of Minesweeper using Pygame.
 
 Last tested on Python 3.11.6 and Pygame version 2.4.0
 
-## Instructions
+## How to run
 
-Install pygame using `pip install pygame` or using your system's repo manager
+Preinstalled binaries are on the releases tab
 
-Download the source code and run the program using `python main.py`
+Alternatively you can run the program through the source code if you have pygame installed by doing `python main.py`
+
+To build the program for youself, you will need pyinstaller. Do `make build` and run the program by doing `dist/pysweeper`  
+
+## Game Instructions
 
 Select the difficulty
 

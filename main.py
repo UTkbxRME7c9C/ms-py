@@ -1,21 +1,32 @@
 import ps
+import os
 import pygame
 import sys
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
-
+    
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+    
 def import_images():
     image_names = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "boom", "flag", "unchecked"]
     image_paths = [f"img/{name}.png" for name in image_names]
-    return [pygame.image.load(path) for path in image_paths]
-    
+    return [pygame.image.load(resource_path(path)) for path in image_paths]
+
+
 def main_pygame():
     pygame.init()
     screen = pygame.display.set_mode((600,600))
     pygame.display.set_caption("Minesweeper")
     clock = pygame.time.Clock()
-    font = pygame.font.Font("font.ttf", 40)
+    font = pygame.font.Font(resource_path("font.ttf"), 40)
     #0-8
     #9 = bomb
     #10 = flag
@@ -143,3 +154,5 @@ def main_pygame():
     
 if __name__ == "__main__":
     main_pygame()
+
+
