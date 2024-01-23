@@ -1,78 +1,144 @@
 import ps
-import pfuncs
 import pygame
 import sys
 
-# No cases, assume input is valid.
-def main():
-    l = int(input("Enter length: "))
-    w = int(input("Enter width: "))
-    
-    pfuncs.print_board_empty(l,w)
+WHITE = (255,255,255)
+BLACK = (0,0,0)
 
-    obj = ps.sweeper(l,w,3)
-    initW = int(input("Enter top coordinate: "))
-    initL = int(input("Enter side coordinate: "))
+def import_images():
+    image_names = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "boom", "flag", "unchecked"]
+    image_paths = [f"img/{name}.png" for name in image_names]
+    return [pygame.image.load(path) for path in image_paths]
     
-    obj.generate_mines(initL,initW)
-    pfuncs.print_board(obj)
-
-    wincase = 0
-    while (wincase == 0):
-        initW = int(input("Enter top coordinate: "))
-        initL = int(input("Enter side coordinate: "))
-        if (obj.checked[initL][initW] == 1):
-            print("Already checked!")
-        elif (obj.mines[initL][initW] == -1):
-            print("You lose!")
-            pfuncs.print_board_answers(obj)
-            wincase = 1
-        else:
-            obj.set_checked(initL,initW)
-            if (obj.check_win()):
-                print("You win!")
-                pfuncs.print_board_answers(obj)
-                wincase = 2
-            else:
-                pfuncs.print_board(obj)
-                
-# Easy: 8x8, 10 mines
-# Medium: 16x16, 40 mines
-# Hard: 30x16, 99 mines 
 def main_pygame():
     pygame.init()
     screen = pygame.display.set_mode((600,600))
     pygame.display.set_caption("Minesweeper")
     clock = pygame.time.Clock()
-    img_1 = pygame.image.load("img/1.png").convert_alpha()
-    img_2 = pygame.image.load("img/2.png").convert_alpha()
-    img_3 = pygame.image.load("img/3.png").convert_alpha()
-    img_4 = pygame.image.load("img/4.png").convert_alpha()
-    img_5 = pygame.image.load("img/5.png").convert_alpha()
-    img_6 = pygame.image.load("img/6.png").convert_alpha()
-    img_7 = pygame.image.load("img/7.png").convert_alpha()
-    img_8 = pygame.image.load("img/8.png").convert_alpha()
-    img_bomb = pygame.image.load("img/boom.png").convert_alpha()
-    img_flag = pygame.image.load("img/flag.png").convert_alpha()
-    img_checked = pygame.image.load("img/checked.png").convert_alpha()
-    img_unchecked = pygame.image.load("img/unchecked.png").convert_alpha()
+    font = pygame.font.Font("font.ttf", 40)
+    #0-8
+    #9 = bomb
+    #10 = flag
+    #11 = unchecked
+    images = import_images()
+    #0 = main menu
+    #1 = game start, waiting for first click
+    #2 = game continue
+    #3 = game over
+    #4 = game win
+    gamestate = 0
+    game = None
+    # board sizes
+    lboardsize = 0 # length of actual board, 600 *squaresize 
+    wboardsize = 0 # width of actual board, 600 *squaresize
+    lboardstart = 0 # length where board starts, 600 - lboardsize / 2
+    wboardstart = 0 # width where board starts, 600 - wboardsize / 2
+    squaresize = 0 # size of each square, 600 / biggest side
     
     while True:
         clock.tick(60)
+        screen.fill((90, 90, 90))
         for event in pygame.event.get():
             if (event.type == pygame.QUIT):
                 pygame.quit()
                 sys.exit()
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            #     if event.button == 1: # lmb
-            #         # handle_left_click(event.pos)
-            #         print(event.pos[0])
-            #         print(event.pos[1])
-            #     elif event.button == 3:  # rmb
-            #         print(event.pos[0])
-            #         print(event.pos[1])          
-        screen.fill((90, 90, 90))
-        
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1: # lmb
+                    if (gamestate == 0):
+                        if (event.pos[0] > 200 and event.pos[0] < 400 and event.pos[1] > 250 and event.pos[1] < 550):
+                            gamestate = 1 
+                            if (event.pos[1] > 250 and event.pos[1] < 350):
+                                game = ps.sweeper(8,8,10)
+                            elif (event.pos[1] > 350 and event.pos[1] < 450):
+                                game = ps.sweeper(18,16,40)
+                            elif (event.pos[1] > 450 and event.pos[1] < 550):
+                                game = ps.sweeper(18,30,99)
+                            squaresize = 600 / (game.length if game.length > game.width else game.width)
+                            lboardsize = game.length * squaresize
+                            wboardsize = game.width * squaresize
+                            lboardstart = (600 - lboardsize) / 2
+                            wboardstart = (600 - wboardsize) / 2
+                            for i in range(12):
+                                images[i] = pygame.transform.scale(images[i], (squaresize,squaresize))
+                    elif (gamestate == 1):
+                        if (event.pos[0] > wboardstart and event.pos[0] < wboardstart + wboardsize and event.pos[1] > lboardstart and event.pos[1] < lboardstart + lboardsize):
+                            lboard = int((event.pos[1] - lboardstart)//(lboardsize/game.length))
+                            wboard = int((event.pos[0] - wboardstart)//(wboardsize/game.width))
+                            game.generate_mines(lboard,wboard)
+                            gamestate = 2
+                    elif (gamestate == 2):
+                        if (event.pos[0] > wboardstart and event.pos[0] < wboardstart + wboardsize and event.pos[1] > lboardstart and event.pos[1] < lboardstart + lboardsize):
+                            lboard = int((event.pos[1] - lboardstart)//(lboardsize/game.length))
+                            wboard = int((event.pos[0] - wboardstart)//(wboardsize/game.width))
+                            if (game.checked[lboard][wboard] == 0):
+                                if (game.mines[lboard][wboard] == -1):
+                                    gamestate = 3
+                                else:
+                                    game.set_checked(lboard,wboard)
+                                    if (game.check_win()):
+                                        gamestate = 4
+                elif event.button == 3:  # rmb
+                    if (gamestate == 2):
+                        if (event.pos[0] > wboardstart and event.pos[0] < wboardstart + wboardsize
+                            and event.pos[1] > lboardstart and event.pos[1] < lboardstart + lboardsize):
+                            lboard = int((event.pos[1] - lboardstart)//(lboardsize/game.length))
+                            wboard = int((event.pos[0] - wboardstart)//(wboardsize/game.width))
+                            game.set_flag(lboard,wboard)
+            elif event.type == pygame.KEYDOWN:
+                if (event.key == pygame.K_ESCAPE):
+                    if (gamestate == 0):
+                        pygame.quit()
+                        sys.exit()
+                    else:
+                        gamestate = 0
+                        images = import_images() #image quality dies without this
+        if (gamestate == 0):
+            tv = ["PySweeper", "Easy","Medium","Hard"]
+            th = [100,300,400,500]
+            for i in range(4):
+                text = font.render(tv[i], True, WHITE)
+                text_rect = text.get_rect(center=(300, th[i]))
+                screen.blit(text, text_rect)
+        elif (gamestate == 1 or gamestate == 2):        
+            for i in range(game.length):
+                for j in range(game.width):
+                    rect = pygame.Rect(
+                        wboardstart + (j * squaresize),
+                        lboardstart + (i * squaresize),
+                        squaresize,
+                        squaresize,
+                    )
+                    if game.checked[i][j] == 0:
+                        screen.blit(images[11], rect)
+                    elif game.checked[i][j] == 1:
+                        screen.blit(images[game.mines[i][j]], rect)
+                    elif game.checked[i][j] == 2:
+                        screen.blit(images[10], rect)
+        else:
+            for i in range(game.length):
+                for j in range(game.width):
+                    rect = pygame.Rect(
+                        wboardstart + (j * squaresize),
+                        lboardstart + (i * squaresize),
+                        squaresize,
+                        squaresize,
+                    )
+                    if game.mines[i][j] == -1:
+                        if gamestate == 3:
+                            screen.blit(images[9], rect)
+                        elif gamestate == 4 and game.checked[i][j] == 2:
+                            screen.blit(images[10], rect)
+                        else:
+                            screen.blit(images[11], rect)
+                    else:
+                        screen.blit(images[game.mines[i][j]], rect)
+            if gamestate == 3:
+                text = font.render("You lose!", True, (255,0,0))
+            else:
+                text = font.render("You win!", True, (0,255,0))
+            text_rect = text.get_rect(center=(300, 300))
+            screen.blit(text, text_rect)
+                    
         pygame.display.update()
     
 if __name__ == "__main__":

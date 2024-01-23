@@ -9,6 +9,7 @@ class sweeper:
         # Tracks the amount of mines adjacent to each square. If a square is a mine, it is -1.
         self.mines = [[0 for i in range(width)] for j in range(length)]
         # Tracks if a square has been checked, including adjacent squares that do not have nearby mines.
+        # Also checks flags if the value is 2.
         self.checked = [[0 for i in range(width)] for j in range(length)]
     
     # Initalizes the class once the starting square is set.
@@ -44,7 +45,13 @@ class sweeper:
             for i in range(l-1,l+2):
                 for j in range(w-1,w+2):
                     if (i >= 0 and i < self.length and j >= 0 and j < self.width):
-                        if (self.mines[i][j] != -1 and self.checked[i][j] == 0):
+                        if (self.mines[i][j] != -1 and self.checked[i][j] != 1):
                             self.set_checked(i,j)
     def check_win(self):
         return self.num_checked == (self.length * self.width) - self.num_mines
+    
+    def set_flag(self,l,w):
+        if (self.checked[l][w] == 0):
+            self.checked[l][w] = 2
+        elif (self.checked[l][w] == 2):
+            self.checked[l][w] = 0
