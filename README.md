@@ -2,7 +2,7 @@
 
 A Python implementation of Minesweeper using Pygame.
 
-Last tested on Python 3.11.6 and Pygame version 2.4.0
+Last tested on Python 3.11 and Pygame version 2.4
 
 ## How to run
 
@@ -31,3 +31,13 @@ Press escape key to exit the program.
 Images by twitter
 
 Font is Pixelod Sans Bold
+
+# Why did i make this?
+
+This was a small challenge that I decided to do for myself: learn a new Python library in under a week. I achieved that and more.
+
+I decided to bring in some minesweeper code that I made a few months ago, but never got around to using, as my basis for my Pygame. For looks I decided to use Twitter emojis and a custom font in the main menu.
+
+I spent the extra time learning how to make binaries for python using Pyinstaller so that the game could be run without having to install python. I also learned how to set up Github actions so that it would automatically compile them for each OS every time I pushed.
+
+Overall, I felt satisfied with how I made this project. It felt similar to Processing, a language library that I was familiar with, but with a bit more boilerplate.
