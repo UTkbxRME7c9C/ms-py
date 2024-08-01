@@ -18,7 +18,7 @@ class sweeper:
         while bomb < self.num_mines:
             i = random.randrange(self.length)
             j = random.randrange(self.width)
-            if (not(i == init_l and j == init_w) and self.mines[i][j] == 0):
+            if (not((init_l-1 <= i <= init_l+1) and (init_w-1 <= j <= init_w+1)) and self.mines[i][j] == 0):
                 self.mines[i][j] = -1
                 bomb += 1
         for i in range(self.length):
